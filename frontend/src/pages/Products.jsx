@@ -1,11 +1,31 @@
 import { useState, useEffect } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiCpu } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiCpu, FiBox } from 'react-icons/fi';
 import axios from 'axios';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [editId, setEditId] = useState(null);
   const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '', category: '', description: '', seoTags: '', marketingCaption: '' });
   const [generatingAI, setGeneratingAI] = useState(false);
 
@@ -34,6 +54,20 @@ const Products = () => {
     }
   };
 
+  const handleEditClick = (product) => {
+    setEditId(product._id);
+    setNewProduct({
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+      description: product.description || '',
+      seoTags: product.seoTags ? product.seoTags.join(', ') : '',
+      marketingCaption: product.marketingCaption || ''
+    });
+    setShowModal(true);
+  };
+
   const handleSaveProduct = async () => {
     try {
       const productData = {
@@ -42,14 +76,26 @@ const Products = () => {
         stock: parseInt(newProduct.stock) || 0,
         seoTags: newProduct.seoTags ? newProduct.seoTags.split(',').map(t => t.trim()).filter(Boolean) : [],
       };
-      const res = await axios.post('/api/products', productData);
-      setProducts([res.data.product, ...products]);
-      setShowModal(false);
-      setNewProduct({ name: '', price: '', stock: '', category: '', description: '', seoTags: '', marketingCaption: '' });
+      
+      if (editId) {
+        const res = await axios.put(`/api/products/${editId}`, productData);
+        setProducts(products.map(p => p._id === editId ? res.data.product : p));
+      } else {
+        const res = await axios.post('/api/products', productData);
+        setProducts([res.data.product, ...products]);
+      }
+      
+      closeModal();
     } catch (err) {
       console.error('Failed to save product', err);
       alert('Failed to save product: ' + (err.response?.data?.message || err.message));
     }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEditId(null);
+    setNewProduct({ name: '', price: '', stock: '', category: '', description: '', seoTags: '', marketingCaption: '' });
   };
 
   const generateAIContent = async () => {
@@ -84,7 +130,7 @@ const Products = () => {
           <p className="text-slate-400 mt-1">Manage your inventory and AI generated content.</p>
         </div>
         <button 
-          onClick={() => setShowModal(true)}
+          onClick={() => { setEditId(null); setShowModal(true); }}
           className="flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white px-4 py-2.5 rounded-lg font-medium transition-all shadow-lg shadow-brand-500/30"
         >
           <FiPlus /> Add Product
@@ -110,6 +156,39 @@ const Products = () => {
           </button>
         </div>
       </div>
+
+      {/* Product Stock Chart */}
+      {!loading && products.length > 0 && (
+        <div className="glass p-6 rounded-2xl mb-6">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <FiBox className="text-brand-400" /> Inventory Levels
+          </h2>
+          <div className="h-64">
+            <Bar 
+              data={{
+                labels: products.map(p => p.name.length > 15 ? p.name.substring(0, 15) + '...' : p.name),
+                datasets: [
+                  {
+                    label: 'Units in Stock',
+                    data: products.map(p => p.stock),
+                    backgroundColor: products.map(p => p.stock > 20 ? 'rgba(74, 222, 128, 0.8)' : p.stock > 0 ? 'rgba(249, 115, 22, 0.8)' : 'rgba(239, 68, 68, 0.8)'),
+                    borderRadius: 4,
+                  }
+                ]
+              }} 
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                  y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+                  x: { grid: { display: false }, ticks: { color: '#94a3b8', maxRotation: 45, minRotation: 45 } }
+                }
+              }} 
+            />
+          </div>
+        </div>
+      )}
 
       {/* Products Table */}
       <div className="glass rounded-2xl overflow-hidden border border-slate-700/50">
@@ -143,7 +222,7 @@ const Products = () => {
                     <button className="text-brand-400 hover:text-brand-300 transition-colors" title="Generate AI Content">
                       <FiCpu />
                     </button>
-                    <button className="text-blue-400 hover:text-blue-300 transition-colors" title="Edit">
+                    <button onClick={() => handleEditClick(product)} className="text-blue-400 hover:text-blue-300 transition-colors" title="Edit">
                       <FiEdit2 />
                     </button>
                     <button onClick={() => handleDelete(product._id)} className="text-red-400 hover:text-red-300 transition-colors" title="Delete">
@@ -157,13 +236,13 @@ const Products = () => {
         </table>
       </div>
 
-      {/* Placeholder for Add Product Modal */}
+      {/* Add/Edit Product Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="glass p-6 rounded-2xl w-full max-w-2xl border border-slate-700 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold">Add New Product</h2>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white">&times;</button>
+              <h2 className="text-xl font-bold">{editId ? 'Edit Product' : 'Add New Product'}</h2>
+              <button onClick={closeModal} className="text-slate-400 hover:text-white">&times;</button>
             </div>
             
             <div className="grid grid-cols-2 gap-6 h-96 overflow-y-auto pr-2">
@@ -204,8 +283,10 @@ const Products = () => {
               </div>
 
               <div className="col-span-2 flex justify-end gap-3 mt-4">
-                <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors">Cancel</button>
-                <button onClick={handleSaveProduct} className="px-4 py-2 bg-brand-600 hover:bg-brand-500 rounded-lg text-white transition-colors shadow-lg shadow-brand-500/30">Save Product</button>
+                <button onClick={closeModal} className="px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors">Cancel</button>
+                <button onClick={handleSaveProduct} className="px-4 py-2 bg-brand-600 hover:bg-brand-500 rounded-lg text-white transition-colors shadow-lg shadow-brand-500/30">
+                  {editId ? 'Update Product' : 'Save Product'}
+                </button>
               </div>
             </div>
           </div>

@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const User = require('./models/User');
 const Product = require('./models/Product');
+const Order = require('./models/Order');
 
 const seedData = async () => {
   try {
@@ -13,6 +14,7 @@ const seedData = async () => {
     // Clear existing data
     await User.deleteMany({});
     await Product.deleteMany({});
+    await Order.deleteMany({});
     console.log('🗑️  Cleared existing data.');
 
     // Create admin user
@@ -118,6 +120,56 @@ const seedData = async () => {
 
     await Product.insertMany(products);
     console.log(`📦 ${products.length} products seeded.`);
+
+    // Fetch the inserted products to use their IDs for orders
+    const insertedProducts = await Product.find({});
+    
+    // Create dummy orders
+    const orders = [
+      {
+        orderId: 'ORD-7829',
+        customer: { name: 'Alex Johnson', email: 'alex@example.com' },
+        items: [{ product: insertedProducts[0]._id, quantity: 1, price: 99.99 }],
+        totalAmount: 99.99,
+        status: 'Delivered',
+        createdAt: new Date(new Date().setDate(new Date().getDate() - 1))
+      },
+      {
+        orderId: 'ORD-7828',
+        customer: { name: 'Sarah Williams', email: 'sarah@example.com' },
+        items: [{ product: insertedProducts[1]._id, quantity: 1, price: 249.99 }],
+        totalAmount: 249.99,
+        status: 'Processing',
+        createdAt: new Date()
+      },
+      {
+        orderId: 'ORD-7827',
+        customer: { name: 'Michael Chen', email: 'michael@example.com' },
+        items: [{ product: insertedProducts[3]._id, quantity: 1, price: 449.00 }],
+        totalAmount: 449.00,
+        status: 'Shipped',
+        createdAt: new Date(new Date().setDate(new Date().getDate() - 2))
+      },
+      {
+        orderId: 'ORD-7826',
+        customer: { name: 'Emily Davis', email: 'emily@example.com' },
+        items: [{ product: insertedProducts[6]._id, quantity: 2, price: 49.99 }],
+        totalAmount: 99.98,
+        status: 'Delivered',
+        createdAt: new Date(new Date().setDate(new Date().getDate() - 3))
+      },
+      {
+        orderId: 'ORD-7825',
+        customer: { name: 'Robert Wilson', email: 'robert@example.com' },
+        items: [{ product: insertedProducts[5]._id, quantity: 1, price: 199.99 }],
+        totalAmount: 199.99,
+        status: 'Cancelled',
+        createdAt: new Date(new Date().setDate(new Date().getDate() - 4))
+      }
+    ];
+
+    await Order.insertMany(orders);
+    console.log(`🛒 ${orders.length} orders seeded.`);
 
     console.log('\n🎉 Seeding complete!');
     process.exit(0);

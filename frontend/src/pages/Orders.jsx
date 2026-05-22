@@ -1,15 +1,38 @@
-import { FiShoppingBag, FiSearch, FiFilter } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
+import { FiShoppingBag, FiSearch, FiFilter, FiPieChart } from 'react-icons/fi';
+import axios from 'axios';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Orders = () => {
-  // Dummy data for demonstration
-  const dummyOrders = [
-    { id: 'ORD-7829', customer: 'Alex Johnson', date: 'Oct 24, 2023', total: 129.99, status: 'Delivered' },
-    { id: 'ORD-7828', customer: 'Sarah Williams', date: 'Oct 24, 2023', total: 84.50, status: 'Processing' },
-    { id: 'ORD-7827', customer: 'Michael Chen', date: 'Oct 23, 2023', total: 249.00, status: 'Shipped' },
-    { id: 'ORD-7826', customer: 'Emily Davis', date: 'Oct 23, 2023', total: 45.00, status: 'Delivered' },
-    { id: 'ORD-7825', customer: 'Robert Wilson', date: 'Oct 22, 2023', total: 199.99, status: 'Cancelled' },
-    { id: 'ORD-7824', customer: 'Jessica Taylor', date: 'Oct 22, 2023', total: 75.25, status: 'Delivered' },
-  ];
+  const [orders, setOrders] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrdersData = async () => {
+      try {
+        const [ordersRes, statsRes] = await Promise.all([
+          axios.get('/api/orders'),
+          axios.get('/api/orders/stats')
+        ]);
+        setOrders(ordersRes.data);
+        setStats(statsRes.data);
+      } catch (err) {
+        console.error('Failed to fetch orders data', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrdersData();
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -28,7 +51,7 @@ const Orders = () => {
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <FiShoppingBag className="text-brand-500" /> Orders
           </h1>
-          <p className="text-slate-400 mt-1">Manage and track customer orders (Demo Data).</p>
+          <p className="text-slate-400 mt-1">Manage and track customer orders.</p>
         </div>
       </div>
 
@@ -46,6 +69,41 @@ const Orders = () => {
         </button>
       </div>
 
+      {/* Order Stats Chart */}
+      {!loading && stats && (
+        <div className="glass p-6 rounded-2xl mb-6">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <FiPieChart className="text-brand-400" /> Order Status Breakdown
+          </h2>
+          <div className="h-64 flex justify-center">
+            <Doughnut 
+              data={{
+                labels: stats.statusCounts.map(s => s.status),
+                datasets: [
+                  {
+                    data: stats.statusCounts.map(s => s.count),
+                    backgroundColor: [
+                      'rgba(74, 222, 128, 0.8)', // Delivered (Green)
+                      'rgba(56, 189, 248, 0.8)', // Processing (Blue)
+                      'rgba(139, 92, 246, 0.8)', // Shipped (Brand)
+                      'rgba(239, 68, 68, 0.8)',  // Cancelled (Red)
+                    ],
+                    borderWidth: 0,
+                  }
+                ]
+              }} 
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'right', labels: { color: '#94a3b8' } }
+                }
+              }} 
+            />
+          </div>
+        </div>
+      )}
+
       <div className="glass rounded-2xl overflow-hidden border border-slate-700/50">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -58,12 +116,12 @@ const Orders = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700/50">
-            {dummyOrders.map((order) => (
-              <tr key={order.id} className="hover:bg-dark-800/30 transition-colors">
-                <td className="px-6 py-4 font-medium text-brand-300">{order.id}</td>
-                <td className="px-6 py-4 text-slate-200">{order.customer}</td>
-                <td className="px-6 py-4 text-slate-400">{order.date}</td>
-                <td className="px-6 py-4 font-medium">${order.total.toFixed(2)}</td>
+            {loading ? <tr><td colSpan="5" className="px-6 py-4 text-center">Loading...</td></tr> : orders.map((order) => (
+              <tr key={order._id} className="hover:bg-dark-800/30 transition-colors">
+                <td className="px-6 py-4 font-medium text-brand-300">{order.orderId}</td>
+                <td className="px-6 py-4 text-slate-200">{order.customer?.name}</td>
+                <td className="px-6 py-4 text-slate-400">{new Date(order.createdAt).toLocaleDateString()}</td>
+                <td className="px-6 py-4 font-medium">${order.totalAmount.toFixed(2)}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
                     {order.status}

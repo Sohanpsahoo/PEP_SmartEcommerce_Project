@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react';
 import { FiDollarSign, FiTrendingUp, FiArrowUpRight, FiArrowDownRight } from 'react-icons/fi';
+import axios from 'axios';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -26,21 +28,55 @@ ChartJS.register(
 );
 
 const Revenue = () => {
-  // Dummy data for demonstration
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [categoryDataState, setCategoryDataState] = useState({ labels: [], data: [] });
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const [analyticsRes, productsRes] = await Promise.all([
+          axios.get('/api/analytics/dashboard'),
+          axios.get('/api/products')
+        ]);
+        
+        setAnalytics(analyticsRes.data);
+        
+        // Compute revenue by category
+        const categoryMap = {};
+        productsRes.data.forEach(p => {
+          if (!categoryMap[p.category]) categoryMap[p.category] = 0;
+          categoryMap[p.category] += (p.salesData?.revenue || 0);
+        });
+        
+        setCategoryDataState({
+          labels: Object.keys(categoryMap),
+          data: Object.values(categoryMap)
+        });
+        
+      } catch (err) {
+        console.error('Failed to fetch analytics', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAnalytics();
+  }, []);
+
   const revenueStats = {
-    total: 176019,
-    growth: 12.5,
-    thisMonth: 28450,
-    lastMonth: 25200,
-    projected: 31000
+    total: analytics?.stats?.totalRevenue || 0,
+    growth: 12.5, // Mock growth rate
+    thisMonth: analytics?.revenueChart?.data?.[analytics.revenueChart.data.length - 1] || 0,
+    lastMonth: analytics?.revenueChart?.data?.[analytics.revenueChart.data.length - 2] || 0,
+    projected: (analytics?.revenueChart?.data?.[analytics.revenueChart.data.length - 1] || 0) * 1.1 // Mock projection
   };
 
   const revenueData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+    labels: analytics?.revenueChart?.labels || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
     datasets: [
       {
         label: 'Revenue ($)',
-        data: [15000, 18000, 17500, 22000, 21000, 25000, 24500, 27000, 26000, 28450],
+        data: analytics?.revenueChart?.data || [0, 0, 0, 0, 0, 0, 0],
         borderColor: '#8b5cf6',
         backgroundColor: 'rgba(139, 92, 246, 0.2)',
         tension: 0.4,
@@ -50,11 +86,11 @@ const Revenue = () => {
   };
 
   const categoryData = {
-    labels: ['Electronics', 'Clothing', 'Accessories', 'Home & Garden'],
+    labels: categoryDataState.labels,
     datasets: [
       {
         label: 'Revenue by Category',
-        data: [85000, 42000, 29000, 20019],
+        data: categoryDataState.data,
         backgroundColor: [
           'rgba(139, 92, 246, 0.8)', // brand-500
           'rgba(56, 189, 248, 0.8)', // sky-400
@@ -92,7 +128,7 @@ const Revenue = () => {
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <FiDollarSign className="text-green-400" /> Revenue
           </h1>
-          <p className="text-slate-400 mt-1">Detailed financial performance and projections (Demo Data).</p>
+          <p className="text-slate-400 mt-1">Detailed financial performance and projections.</p>
         </div>
         <div className="bg-dark-800 px-4 py-2 rounded-lg border border-slate-700 text-sm text-slate-300">
           Year to Date
@@ -136,7 +172,11 @@ const Revenue = () => {
         <div className="glass p-6 rounded-2xl">
           <h2 className="text-lg font-semibold mb-6">Revenue by Category</h2>
           <div className="h-80">
-            <Bar data={categoryData} options={{...chartOptions, indexAxis: 'y'}} />
+            {categoryDataState.labels.length > 0 ? (
+              <Bar data={categoryData} options={{...chartOptions, indexAxis: 'y'}} />
+            ) : (
+              <div className="h-full flex items-center justify-center text-slate-500">No category data</div>
+            )}
           </div>
         </div>
       </div>
