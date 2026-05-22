@@ -219,4 +219,4 @@ Open source under the [MIT License](LICENSE).
 
 ---
 
-**Built with ❤️ by [Sohan Prasad Sahoo](https://github.com/Sohanpsahoo)**
+**Built with ❤️ by [Sohan Priyadarshi Sahoo](https://github.com/Sohanpsahoo)**
