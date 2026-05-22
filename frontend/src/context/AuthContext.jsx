@@ -30,7 +30,8 @@ export const AuthProvider = ({ children }) => {
       setUser(res.data.user);
       return res.data;
     } catch (err) {
-      throw err.response?.data?.message || 'Login failed';
+      console.error('Login error:', err);
+      throw err.response?.data?.message || 'Login failed. Is the backend server running?';
     }
   };
 
@@ -41,7 +42,8 @@ export const AuthProvider = ({ children }) => {
       setUser(res.data.user);
       return res.data;
     } catch (err) {
-      throw err.response?.data?.message || 'Signup failed';
+      console.error('Signup error:', err);
+      throw err.response?.data?.message || 'Signup failed. Is the backend server running?';
     }
   };
 

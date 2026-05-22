@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FiGrid, FiBox, FiTrendingUp, FiLogOut } from 'react-icons/fi';
+import { FiGrid, FiBox, FiTrendingUp, FiLogOut, FiUser } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
@@ -16,6 +16,7 @@ const Sidebar = () => {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <FiGrid className="w-5 h-5" /> },
     { name: 'Products', path: '/products', icon: <FiBox className="w-5 h-5" /> },
+    { name: 'Profile', path: '/profile', icon: <FiUser className="w-5 h-5" /> },
   ];
 
   return (

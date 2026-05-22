@@ -36,7 +36,13 @@ const Products = () => {
 
   const handleSaveProduct = async () => {
     try {
-      const res = await axios.post('/api/products', newProduct);
+      const productData = {
+        ...newProduct,
+        price: parseFloat(newProduct.price) || 0,
+        stock: parseInt(newProduct.stock) || 0,
+        seoTags: newProduct.seoTags ? newProduct.seoTags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      };
+      const res = await axios.post('/api/products', productData);
       setProducts([res.data.product, ...products]);
       setShowModal(false);
       setNewProduct({ name: '', price: '', stock: '', category: '', description: '', seoTags: '', marketingCaption: '' });
@@ -58,9 +64,9 @@ const Products = () => {
       });
       setNewProduct(prev => ({
         ...prev,
-        description: res.data.description,
-        seoTags: res.data.seoTags.join(', '),
-        marketingCaption: res.data.marketingCaption
+        description: res.data.data.description,
+        seoTags: res.data.data.seoTags.join(', '),
+        marketingCaption: res.data.data.marketingCaption
       }));
     } catch (err) {
       console.error('AI Generation failed', err);

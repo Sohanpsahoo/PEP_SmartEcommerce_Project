@@ -70,4 +70,46 @@ router.post('/login', async (req, res) => {
   }
 });
 
+const authMiddleware = require('../middleware/authMiddleware');
+
+// GET /api/auth/profile
+router.get('/profile', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error.', error: err.message });
+  }
+});
+
+// PUT /api/auth/profile
+router.put('/profile', authMiddleware, async (req, res) => {
+  try {
+    const { name, password } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    if (name) user.name = name;
+    if (password) {
+      if (password.length < 6) {
+        return res.status(400).json({ message: 'Password must be at least 6 characters long.' });
+      }
+      user.password = password; // Will be hashed automatically by the pre-save hook
+    }
+
+    await user.save();
+    res.json({
+      message: 'Profile updated successfully!',
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error.', error: err.message });
+  }
+});
+
 module.exports = router;
