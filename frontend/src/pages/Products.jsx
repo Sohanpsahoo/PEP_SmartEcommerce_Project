@@ -70,7 +70,7 @@ const Products = () => {
       }));
     } catch (err) {
       console.error('AI Generation failed', err);
-      alert('AI Generation failed.');
+      alert('AI Generation failed: ' + (err.response?.data?.message || err.message));
     } finally {
       setGeneratingAI(false);
     }
