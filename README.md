@@ -1,341 +1,222 @@
-<![CDATA[<div align="center">
+# 🛒 SmartStore AI
 
-# 🛒 SmartStore AI — Intelligent E-Commerce Management Platform
+### Intelligent E-Commerce Management Platform
 
-**An AI-powered e-commerce dashboard that helps store owners manage products, track orders, analyze revenue, and get actionable business insights — all in one place.**
+> An AI-powered dashboard that helps store owners manage products, track orders, analyze revenue, and get actionable business insights — all in one place.
 
-[![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-v19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/atlas)
-[![Gemini AI](https://img.shields.io/badge/Google_Gemini-AI_Powered-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-
----
-
-</div>
-
-## 📋 Table of Contents
-
-- [About The Project](#-about-the-project)
-- [Key Features](#-key-features)
-- [Tech Stack](#-tech-stack)
-- [Project Architecture](#-project-architecture)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [API Endpoints](#-api-endpoints)
-- [Deployment](#-deployment)
-- [Screenshots](#-screenshots)
-- [Contributing](#-contributing)
-- [License](#-license)
+![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=flat-square&logo=nodedotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-v19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini-AI_Powered-4285F4?style=flat-square&logo=google&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 
 ---
 
-## 🚀 About The Project
+## 📌 What is SmartStore AI?
 
-**SmartStore AI** is a full-stack, AI-enhanced e-commerce management dashboard built for store owners and small businesses. Instead of juggling multiple tools, SmartStore gives you a single, beautiful interface to:
+SmartStore AI is a full-stack e-commerce management dashboard designed for store owners and small businesses. It combines traditional store management with Google Gemini AI to provide:
 
-- **Manage your product catalog** with AI-generated descriptions, SEO tags, and marketing captions.
-- **Track orders** with detailed customer info, status updates, and item-level breakdown.
-- **Monitor revenue** with interactive charts and monthly breakdowns.
-- **Chat with an AI assistant** that understands your store data and provides real-time business insights.
-- **View smart analytics** including pricing recommendations, inventory alerts, and trending product analysis.
+- **AI-generated product descriptions**, SEO tags, and marketing captions
+- **Smart business insights** — pricing recommendations, inventory alerts, trending analysis
+- **Conversational AI chatbot** that understands your entire store data
+- **Beautiful dark-themed dashboard** with real-time KPIs and interactive charts
+- **Complete CRUD** for products, orders, and revenue — all stored in MongoDB
 
-When a new user signs up, the platform automatically seeds realistic dummy data (products, orders, and revenue entries) so the dashboard is immediately populated and ready to explore.
+New accounts are automatically seeded with sample data so the dashboard looks great from day one.
 
 ---
 
-## ✨ Key Features
+## ✨ Features at a Glance
 
-### 🤖 AI-Powered Intelligence
-| Feature | Description |
-|---|---|
-| **Smart Product Copywriting** | Automatically generates compelling product descriptions, SEO tags, and social media captions using Google Gemini AI. |
-| **AI Chat Assistant** | A conversational chatbot that analyzes your entire store — products, orders, revenue — and answers business questions in real time. |
-| **Business Insights Engine** | AI-driven pricing recommendations, inventory alerts (low-stock warnings), and trending product analysis. |
-| **Multi-Model Fallback** | Automatically cycles through `gemini-2.0-flash` → `gemini-1.5-pro` → `gemini-1.5-flash` if any model hits a rate limit or goes down. |
-
-### 📊 Dashboard & Analytics
-- **Real-time KPI Cards** — Total Revenue, Total Products, Total Orders, and Units Sold at a glance.
-- **Interactive Revenue Chart** — Beautiful gradient-filled line chart with monthly revenue trends.
-- **Top Performing Products** — Ranked list of your best-selling products by revenue.
-- **AI Insights Sidebar** — Live pricing, inventory, and trending recommendations powered by Gemini.
-
-### 📦 Product Management
-- Full CRUD operations (Create, Read, Update, Delete).
-- AI-generated descriptions and SEO tags on product creation.
-- Stock tracking with low-stock alerts.
-- Sales data (units sold & revenue) per product.
-
-### 🛍️ Order Management
-- Add orders manually with customer details, multiple items, quantities, and pricing.
-- Order status tracking: `Processing` → `Shipped` → `Delivered` → `Cancelled`.
-- Auto-generated unique Order IDs.
-- Full item-level breakdown with product references.
-
-### 💰 Revenue Tracking
-- Monthly revenue entries with notes.
-- Interactive charts with gradient fills.
-- Year-over-year tracking support.
-
-### 👤 User Authentication & Profile
-- Secure JWT-based authentication (signup/login).
-- Password hashing with bcrypt.
-- Profile management (update name, change password).
-- Account stats overview (products, units sold, revenue).
-
-### 🎨 Premium UI/UX
-- Dark-themed glassmorphism design.
-- Smooth micro-animations and hover effects.
-- Fully responsive layout (mobile, tablet, desktop).
-- Split-screen login/signup pages with feature highlights.
+| Category | What You Get |
+|----------|-------------|
+| 🤖 **AI Copywriting** | Auto-generate product descriptions, SEO tags & social captions |
+| 💬 **AI Chat Assistant** | Ask questions about your sales, revenue, products in natural language |
+| 📊 **Live Dashboard** | KPI cards, revenue charts, top products, AI insights sidebar |
+| 📦 **Product Management** | Add/edit/delete products with stock tracking & sales data |
+| 🛍️ **Order Management** | Manual order entry with customer details, items & status tracking |
+| 💰 **Revenue Tracking** | Monthly entries with notes, interactive gradient charts |
+| 🔐 **Auth & Security** | JWT authentication, bcrypt password hashing, profile management |
+| 🎨 **Premium UI** | Glassmorphism dark theme, micro-animations, fully responsive |
+| 🔄 **AI Fallback** | Auto-switches between Gemini models if one hits rate limits |
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
-| Technology | Purpose |
-|---|---|
-| **React 19** | UI library |
-| **Vite 8** | Build tool & dev server |
-| **Tailwind CSS 4** | Utility-first styling |
-| **React Router v7** | Client-side routing |
-| **Chart.js + react-chartjs-2** | Interactive charts |
-| **React Icons (Feather)** | Icon library |
-| **Axios** | HTTP client |
+**Frontend:** React 19 · Vite 8 · Tailwind CSS 4 · React Router v7 · Chart.js · Axios
 
-### Backend
-| Technology | Purpose |
-|---|---|
-| **Node.js + Express 5** | REST API server |
-| **MongoDB Atlas + Mongoose 9** | Cloud database & ODM |
-| **Google Generative AI SDK** | Gemini AI integration |
-| **JSON Web Tokens (JWT)** | Authentication |
-| **bcrypt** | Password hashing |
-| **dotenv** | Environment variable management |
+**Backend:** Node.js · Express 5 · MongoDB Atlas · Mongoose 9 · Google Generative AI SDK · JWT · bcrypt
 
 ---
 
-## 📁 Project Architecture
+## 📁 Project Structure
 
 ```
-PEP_Final_Project/
+SmartStore AI/
+│
 ├── backend/
-│   ├── middleware/
-│   │   └── authMiddleware.js        # JWT authentication middleware
+│   ├── middleware/authMiddleware.js    # JWT auth guard
 │   ├── models/
-│   │   ├── User.js                  # User schema (name, email, password)
-│   │   ├── Product.js               # Product schema (name, price, stock, salesData)
-│   │   ├── Order.js                 # Order schema (customer, items, status)
-│   │   └── Revenue.js               # Revenue schema (month, year, amount)
+│   │   ├── User.js                    # User schema
+│   │   ├── Product.js                 # Product schema with salesData
+│   │   ├── Order.js                   # Order schema with items
+│   │   └── Revenue.js                 # Monthly revenue schema
 │   ├── routes/
-│   │   ├── authRoutes.js            # Signup, login, profile + dummy data seeding
-│   │   ├── productRoutes.js         # Product CRUD operations
-│   │   ├── orderRoutes.js           # Order CRUD operations
-│   │   ├── revenueRoutes.js         # Revenue CRUD operations
-│   │   ├── aiRoutes.js              # AI content generation, insights, chat
-│   │   └── analyticsRoutes.js       # Dashboard analytics aggregation
-│   ├── server.js                    # Express app entry point
-│   ├── package.json
-│   └── .env                         # Environment variables (not committed)
+│   │   ├── authRoutes.js              # Auth + dummy data seeding
+│   │   ├── productRoutes.js           # Product CRUD
+│   │   ├── orderRoutes.js             # Order CRUD
+│   │   ├── revenueRoutes.js           # Revenue CRUD
+│   │   ├── aiRoutes.js                # AI generation, insights, chat
+│   │   └── analyticsRoutes.js         # Dashboard stats
+│   └── server.js                      # Entry point
 │
 ├── frontend/
-│   ├── public/
-│   │   └── _redirects               # Netlify/Render SPA routing fallback
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Layout.jsx           # Main app layout with sidebar
-│   │   │   └── ChatWidget.jsx       # Floating AI chat assistant
-│   │   ├── context/
-│   │   │   └── AuthContext.jsx      # Authentication context provider
+│   │   │   ├── Layout.jsx             # Sidebar layout
+│   │   │   └── ChatWidget.jsx         # Floating AI chat
+│   │   ├── context/AuthContext.jsx     # Auth state management
 │   │   ├── pages/
-│   │   │   ├── Dashboard.jsx        # Main dashboard with KPIs & charts
-│   │   │   ├── Products.jsx         # Product management page
-│   │   │   ├── Orders.jsx           # Order management page
-│   │   │   ├── Revenue.jsx          # Revenue tracking page
-│   │   │   ├── Insights.jsx         # AI business insights page
-│   │   │   ├── Profile.jsx          # User profile & settings
-│   │   │   ├── Login.jsx            # Login page (split-screen design)
-│   │   │   └── Signup.jsx           # Signup page (split-screen design)
-│   │   ├── App.jsx                  # React Router configuration
-│   │   ├── main.jsx                 # App entry point + axios config
-│   │   └── index.css                # Global styles & design tokens
-│   ├── vite.config.js
-│   └── package.json
+│   │   │   ├── Dashboard.jsx          # Main dashboard
+│   │   │   ├── Products.jsx           # Product management
+│   │   │   ├── Orders.jsx             # Order management
+│   │   │   ├── Revenue.jsx            # Revenue tracking
+│   │   │   ├── Insights.jsx           # AI insights
+│   │   │   ├── Profile.jsx            # User profile
+│   │   │   ├── Login.jsx              # Login page
+│   │   │   └── Signup.jsx             # Signup page
+│   │   ├── App.jsx                    # Router config
+│   │   └── main.jsx                   # Entry point
+│   └── vite.config.js
 │
-├── README.md
-└── .gitignore
+└── README.md
 ```
 
 ---
 
-## 🏁 Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Node.js** v18 or higher — [Download](https://nodejs.org/)
-- **MongoDB Atlas** account (free tier works) — [Sign Up](https://www.mongodb.com/cloud/atlas)
-- **Google Gemini API Key** — [Get API Key](https://ai.google.dev/)
+- [Node.js](https://nodejs.org/) v18+
+- [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) account (free tier works)
+- [Google Gemini API Key](https://ai.google.dev/)
 
-### Installation
+### Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Sohanpsahoo/PEP_SmartEcommerce_Project.git
-   cd PEP_SmartEcommerce_Project
-   ```
+```bash
+# 1. Clone the repo
+git clone https://github.com/Sohanpsahoo/PEP_SmartEcommerce_Project.git
+cd PEP_SmartEcommerce_Project
 
-2. **Install backend dependencies**
-   ```bash
-   cd backend
-   npm install
-   ```
+# 2. Setup backend
+cd backend
+npm install
 
-3. **Install frontend dependencies**
-   ```bash
-   cd ../frontend
-   npm install
-   ```
+# 3. Create backend/.env file with:
+#    MONGO_URI=your_mongodb_connection_string
+#    JWT_SECRET=your_secret_key
+#    GEMINI_API_KEY=your_gemini_api_key
 
-4. **Set up environment variables** (see section below)
+# 4. Start backend (runs on port 5000)
+npm start
 
-5. **Start the backend server**
-   ```bash
-   cd ../backend
-   npm start
-   ```
-   The server will start on `http://localhost:5000`.
-
-6. **Start the frontend dev server** (in a new terminal)
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-   The app will open at `http://localhost:5173`.
-
----
-
-## 🔐 Environment Variables
-
-Create a `.env` file inside the `backend/` directory with the following variables:
-
-```env
-MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
-JWT_SECRET=your_jwt_secret_key_here
-GEMINI_API_KEY=your_google_gemini_api_key_here
+# 5. In a new terminal, setup frontend
+cd ../frontend
+npm install
+npm run dev
+# Frontend runs on http://localhost:5173
 ```
 
-| Variable | Description |
-|---|---|
-| `MONGO_URI` | MongoDB Atlas connection string |
-| `JWT_SECRET` | Secret key for signing JWT tokens |
-| `GEMINI_API_KEY` | Google Gemini API key for AI features |
-
-> **Note:** For the frontend deployment, you also need to set `VITE_API_URL` as an environment variable pointing to your deployed backend URL.
-
 ---
 
-## 📡 API Endpoints
+## 📡 API Reference
 
-### Authentication
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/auth/signup` | Register a new user (+ seeds dummy data) |
-| `POST` | `/api/auth/login` | Login and receive JWT token |
-| `GET` | `/api/auth/profile` | Get current user profile |
-| `PUT` | `/api/auth/profile` | Update name or password |
+### Auth
+```
+POST   /api/auth/signup      →  Register (auto-seeds dummy data)
+POST   /api/auth/login       →  Login & get JWT
+GET    /api/auth/profile     →  Get profile
+PUT    /api/auth/profile     →  Update name/password
+```
 
 ### Products
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/products` | Get all products |
-| `POST` | `/api/products` | Create a new product |
-| `PUT` | `/api/products/:id` | Update a product |
-| `DELETE` | `/api/products/:id` | Delete a product |
+```
+GET    /api/products          →  List all products
+POST   /api/products          →  Create product
+PUT    /api/products/:id      →  Update product
+DELETE /api/products/:id      →  Delete product
+```
 
 ### Orders
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/orders` | Get all orders |
-| `POST` | `/api/orders` | Create a new order |
-| `PUT` | `/api/orders/:id` | Update order status |
-| `DELETE` | `/api/orders/:id` | Delete an order |
+```
+GET    /api/orders            →  List all orders
+POST   /api/orders            →  Create order
+PUT    /api/orders/:id        →  Update order status
+DELETE /api/orders/:id        →  Delete order
+```
 
 ### Revenue
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/revenue` | Get all revenue entries |
-| `POST` | `/api/revenue` | Add a revenue entry |
-| `DELETE` | `/api/revenue/:id` | Delete a revenue entry |
+```
+GET    /api/revenue           →  List all entries
+POST   /api/revenue           →  Add entry
+DELETE /api/revenue/:id       →  Delete entry
+```
 
-### AI Features
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/ai/generate-content` | Generate product description, SEO tags & marketing caption |
-| `GET` | `/api/ai/insights` | Get AI-driven business insights |
-| `POST` | `/api/ai/chat` | Chat with the AI assistant |
+### AI
+```
+POST   /api/ai/generate-content  →  Generate description, SEO tags, caption
+GET    /api/ai/insights           →  Get business insights
+POST   /api/ai/chat               →  Chat with AI assistant
+```
 
 ### Analytics
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/analytics/dashboard` | Get aggregated dashboard stats |
+```
+GET    /api/analytics/dashboard   →  Aggregated dashboard stats
+```
 
 ---
 
-## 🌐 Deployment
+## 🌐 Deployment (Render)
 
-### Deploy on Render (Recommended)
+### Backend → Web Service
 
-#### Backend (Web Service)
-1. Go to [Render.com](https://render.com) → **New +** → **Web Service**.
-2. Connect your GitHub repository.
-3. Set **Root Directory** to `backend`.
-4. Set **Build Command** to `npm install`.
-5. Set **Start Command** to `npm start`.
-6. Add environment variables (`MONGO_URI`, `JWT_SECRET`, `GEMINI_API_KEY`).
-7. Click **Create Web Service**.
+1. [Render.com](https://render.com) → **New+** → **Web Service**
+2. Connect GitHub repo
+3. **Root Directory:** `backend`
+4. **Build Command:** `npm install`
+5. **Start Command:** `npm start`
+6. Add env vars: `MONGO_URI`, `JWT_SECRET`, `GEMINI_API_KEY`
+7. Deploy → Copy the live URL
 
-#### Frontend (Static Site)
-1. Go to Render → **New +** → **Static Site**.
-2. Connect the same GitHub repository.
-3. Set **Root Directory** to `frontend`.
-4. Set **Build Command** to `npm install && npm run build`.
-5. Set **Publish Directory** to `dist`.
-6. Add environment variable: `VITE_API_URL` = `<your-backend-render-url>`.
-7. Add a **Rewrite Rule**: Source `/*` → Destination `/index.html` → Action `Rewrite`.
-8. Click **Create Static Site**.
+### Frontend → Static Site
 
----
-
-## 🖼️ Screenshots
-
-> _Screenshots coming soon! Deploy the application and explore the beautiful dashboard, AI chat assistant, and product management pages._
+1. Render → **New+** → **Static Site**
+2. Connect same repo
+3. **Root Directory:** `frontend`
+4. **Build Command:** `npm install && npm run build`
+5. **Publish Directory:** `dist`
+6. Add env var: `VITE_API_URL` = your backend URL from above
+7. Add rewrite rule: `/*` → `/index.html` (Action: Rewrite)
+8. Deploy
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! If you'd like to improve SmartStore AI:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/amazing-feature`).
-3. Commit your changes (`git commit -m 'Add amazing feature'`).
-4. Push to the branch (`git push origin feature/amazing-feature`).
-5. Open a Pull Request.
+1. Fork the repo
+2. Create your branch: `git checkout -b feature/my-feature`
+3. Commit: `git commit -m 'Add my feature'`
+4. Push: `git push origin feature/my-feature`
+5. Open a Pull Request
 
 ---
 
 ## 📜 License
 
-This project is open source and available under the [MIT License](LICENSE).
+Open source under the [MIT License](LICENSE).
 
 ---
 
-<div align="center">
-
 **Built with ❤️ by [Sohan Prasad Sahoo](https://github.com/Sohanpsahoo)**
-
-⭐ Star this repository if you found it helpful!
-
-</div>
-]]>
