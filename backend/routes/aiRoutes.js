@@ -85,7 +85,7 @@ router.post('/insights', async (req, res) => {
     const productSummary = products
       .map(
         (p) =>
-          `- ${p.name} | Category: ${p.category} | Price: $${p.price} | Stock: ${p.stock} | Units Sold: ${p.salesData?.unitsSold || 0} | Revenue: $${p.salesData?.revenue || 0}`
+          `- ${p.name} | Category: ${p.category} | Price: $${p.price} | Stock: ${p.stock} | Units Sold: ${p.salesData?.unitsSold || 0} | Revenue: $${p.salesData?.revenue || 0} | Added: ${new Date(p.createdAt).toLocaleDateString()}`
       )
       .join('\n');
 
@@ -111,7 +111,7 @@ Provide your analysis in this exact JSON format (no markdown, no code blocks):
 
 Rules:
 - For pricing: suggest price changes based on sales performance.
-- For trending: identify patterns and opportunities.
+- For trending: identify patterns, opportunities, and SPECIFICALLY highlight newly added products and how to promote them.
 - For inventoryAlerts: flag products with stock <= 15 as low stock.
 - Keep each recommendation concise (1-2 sentences).
 - Return at least 1 item per category.`;
@@ -206,6 +206,15 @@ function generateFallbackInsights(products) {
       action: `Feature trending products on the home screen banner.`
     }
   ];
+
+  // Highlight recently added products
+  const recentlyAdded = [...products].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+  if (recentlyAdded) {
+    trending.push({
+      insight: `New Arrival: "${recentlyAdded.name}" was recently added to your inventory.`,
+      action: `Launch an email campaign introducing this new product to your top customers.`
+    });
+  }
 
   const inventoryAlerts = lowStock.map(p => ({
     product: p.name,
