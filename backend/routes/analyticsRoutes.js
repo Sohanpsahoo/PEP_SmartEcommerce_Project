@@ -1,5 +1,6 @@
 const express = require('express');
 const Product = require('../models/Product');
+const Revenue = require('../models/Revenue');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -10,9 +11,9 @@ router.get('/dashboard', async (req, res) => {
   try {
     const products = await Product.find().lean();
 
-    // Calculate totals
+    // Calculate totals from products
     const totalProducts = products.length;
-    const totalRevenue = products.reduce((sum, p) => sum + (p.salesData?.revenue || 0), 0);
+    const productRevenue = products.reduce((sum, p) => sum + (p.salesData?.revenue || 0), 0);
     const totalUnitsSold = products.reduce((sum, p) => sum + (p.salesData?.unitsSold || 0), 0);
     const lowStockProducts = products.filter((p) => p.stock <= 15);
 
@@ -26,12 +27,31 @@ router.get('/dashboard', async (req, res) => {
         unitsSold: p.salesData?.unitsSold || 0,
       }));
 
-    // Monthly revenue mock breakdown (simulated from product data)
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-    const monthlyRevenue = months.map((_, i) => {
-      // Distribute total revenue across months with a growth curve
+    // Fetch manual revenue entries for this user, current year
+    const currentYear = new Date().getFullYear();
+    const manualRevenue = await Revenue.aggregate([
+      { $match: { createdBy: req.userId, year: currentYear } },
+      { $group: { _id: '$month', total: { $sum: '$amount' } } },
+    ]);
+
+    const manualRevenueMap = {};
+    let totalManualRevenue = 0;
+    manualRevenue.forEach((item) => {
+      manualRevenueMap[item._id] = item.total;
+      totalManualRevenue += item.total;
+    });
+
+    const totalRevenue = productRevenue + totalManualRevenue;
+
+    // Build 12-month chart with both product + manual revenue
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthlyRevenue = months.map((m, i) => {
+      // Distribute product revenue across months with a growth curve
       const factor = (i + 1) / months.length;
-      return Math.round((totalRevenue / months.length) * (0.6 + factor * 0.8));
+      const productMonthly = Math.round((productRevenue / months.length) * (0.6 + factor * 0.8));
+      // Add manual revenue for this month
+      const manual = manualRevenueMap[m] || 0;
+      return productMonthly + manual;
     });
 
     res.json({

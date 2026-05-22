@@ -8,6 +8,7 @@ const productRoutes = require('./routes/productRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const revenueRoutes = require('./routes/revenueRoutes');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/revenue', revenueRoutes);
 
 // Health check
 app.get('/', (req, res) => {
