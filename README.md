@@ -215,7 +215,17 @@ GET    /api/analytics/dashboard   →  Aggregated dashboard stats
 
 ## 📜 License
 
+
+
+
 Open source under the [MIT License](LICENSE).
+
+
+
+<img width="1919" height="909" alt="image" src="https://github.com/user-attachments/assets/51ae13fe-4a9c-406d-aefd-0dad69ec864d" />
+
+
+
 
 ---
 
