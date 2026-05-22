@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { FiUser, FiMail, FiShield, FiCalendar, FiLock, FiActivity, FiCheckCircle, FiPackage, FiDollarSign, FiTrendingUp, FiEdit3, FiKey, FiStar } from 'react-icons/fi';
+import { FiUser, FiMail, FiShield, FiCalendar, FiLock, FiActivity, FiCheckCircle, FiAlertCircle, FiPackage, FiDollarSign, FiTrendingUp, FiEdit3, FiKey, FiStar } from 'react-icons/fi';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, logout } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
@@ -30,6 +30,9 @@ const Profile = () => {
         });
       } catch (err) {
         console.error('Failed to load profile data', err);
+        if (err.response?.status === 404 || err.response?.status === 401) {
+          logout();
+        }
       } finally {
         setLoading(false);
       }
@@ -251,7 +254,11 @@ const Profile = () => {
                     : 'bg-red-500/10 border-red-500/30 text-red-400'
                 }`}
               >
-                <FiCheckCircle className="w-5 h-5 flex-shrink-0" />
+                {message.type === 'success' ? (
+                  <FiCheckCircle className="w-5 h-5 flex-shrink-0" />
+                ) : (
+                  <FiAlertCircle className="w-5 h-5 flex-shrink-0" />
+                )}
                 {message.text}
               </div>
             )}
