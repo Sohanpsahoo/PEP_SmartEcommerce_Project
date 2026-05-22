@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiCpu, FiTrendingUp, FiEdit3, FiShield } from 'react-icons/fi';
+import { FiCpu, FiTrendingUp, FiEdit3, FiShield, FiCheckCircle } from 'react-icons/fi';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -31,116 +31,143 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-dark-900 overflow-hidden relative">
-      {/* Background Decorative Blobs */}
-      <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-600/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen w-full flex bg-dark-900 overflow-hidden font-sans">
+      
+      {/* LEFT PANEL - Premium Showcase */}
+      <div className="hidden lg:flex w-[55%] relative flex-col justify-between p-16 bg-dark-950 overflow-hidden border-r border-slate-800">
+        
+        {/* Abstract Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-[20%] -left-[20%] w-[80%] h-[80%] bg-purple-600/20 rounded-full blur-[130px]" />
+          <div className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-brand-600/10 rounded-full blur-[100px]" />
+          {/* Subtle grid pattern */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L3N2Zz4=')] [mask-image:linear-gradient(to_bottom,white,transparent)]" />
+        </div>
 
-      {/* Left Panel: Insights & Features */}
-      <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 relative z-10 border-r border-slate-700/50 bg-dark-900/50 backdrop-blur-sm">
-        <div>
-          <div className="flex items-center gap-3 mb-16">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/30">
-              <FiCpu className="w-6 h-6 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">SmartStore AI</h1>
+        {/* Brand */}
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg shadow-brand-500/20 border border-white/10">
+            <FiCpu className="w-6 h-6 text-white" />
+          </div>
+          <span className="text-2xl font-bold text-white tracking-tight">SmartStore<span className="text-brand-400">.ai</span></span>
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-xl my-auto py-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-sm font-medium mb-6">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+            </span>
+            New features released
           </div>
 
-          <div className="max-w-md">
-            <h2 className="text-4xl font-extrabold text-white mb-6 leading-tight">
-              Start building your <br/>
-              <span className="bg-gradient-to-r from-brand-400 to-purple-400 bg-clip-text text-transparent">AI-powered empire.</span>
-            </h2>
-            <p className="text-slate-400 text-lg mb-12">
-              Join today and get access to intelligent tools designed to help you scale faster and sell smarter.
-            </p>
+          <h1 className="text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-[1.1] tracking-tight">
+            Start building your <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-purple-400 to-pink-400 animate-gradient">
+              AI-powered empire.
+            </span>
+          </h1>
+          <p className="text-lg text-slate-400 leading-relaxed mb-10">
+            Join thousands of modern sellers who use SmartStore to automate operations, optimize pricing, and scale their businesses effortlessly.
+          </p>
 
-            <div className="space-y-8">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-brand-500/10 rounded-xl mt-1">
-                  <FiTrendingUp className="w-6 h-6 text-brand-400" />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold text-lg mb-1">AI Sales Insights</h3>
-                  <p className="text-slate-400 text-sm">Get real-time pricing recommendations and trend analysis based on your live store data.</p>
-                </div>
+          {/* Feature Grid to fill space beautifully */}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="glass p-5 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-brand-500/20 flex items-center justify-center mb-4">
+                <FiTrendingUp className="w-5 h-5 text-brand-400" />
               </div>
-
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-purple-500/10 rounded-xl mt-1">
-                  <FiEdit3 className="w-6 h-6 text-purple-400" />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold text-lg mb-1">Automated Copywriting</h3>
-                  <p className="text-slate-400 text-sm">Instantly generate high-converting product descriptions, SEO tags, and marketing copy.</p>
-                </div>
+              <h3 className="text-white font-semibold mb-1">Sales Insights</h3>
+              <p className="text-sm text-slate-400">Pricing & trend analysis</p>
+            </div>
+            <div className="glass p-5 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center mb-4">
+                <FiEdit3 className="w-5 h-5 text-purple-400" />
               </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-emerald-500/10 rounded-xl mt-1">
-                  <FiShield className="w-6 h-6 text-emerald-400" />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold text-lg mb-1">Secure & Scalable</h3>
-                  <p className="text-slate-400 text-sm">Enterprise-grade security for your data, built to scale as your business grows.</p>
-                </div>
+              <h3 className="text-white font-semibold mb-1">Auto-Copywriting</h3>
+              <p className="text-sm text-slate-400">SEO optimized descriptions</p>
+            </div>
+            <div className="glass p-5 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4">
+                <FiCheckCircle className="w-5 h-5 text-emerald-400" />
               </div>
+              <h3 className="text-white font-semibold mb-1">Inventory Sync</h3>
+              <p className="text-sm text-slate-400">Automated stock alerts</p>
+            </div>
+             <div className="glass p-5 rounded-2xl border border-white/5 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center mb-4">
+                <FiShield className="w-5 h-5 text-blue-400" />
+              </div>
+              <h3 className="text-white font-semibold mb-1">Secure Data</h3>
+              <p className="text-sm text-slate-400">Encrypted enterprise storage</p>
             </div>
           </div>
         </div>
-        
-        <div className="text-sm text-slate-500">
-          © {new Date().getFullYear()} SmartStore AI. All rights reserved.
+
+        {/* Footer */}
+        <div className="relative z-10 flex items-center justify-between border-t border-white/10 pt-8 mt-8">
+          <p className="text-sm text-slate-500 font-medium">Join the next generation of commerce.</p>
         </div>
       </div>
 
-      {/* Right Panel: Signup Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10">
-        <div className="w-full max-w-md">
-          <div className="text-center lg:text-left mb-10">
-            <h2 className="text-3xl font-bold text-white mb-2">Create an Account</h2>
-            <p className="text-slate-400">Set up your admin access to get started</p>
+      {/* RIGHT PANEL - Auth Form */}
+      <div className="w-full lg:w-[45%] flex items-center justify-center p-8 sm:p-12 relative bg-dark-900">
+        
+        {/* Mobile Logo */}
+        <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center">
+            <FiCpu className="w-4 h-4 text-white" />
+          </div>
+          <span className="text-lg font-bold text-white">SmartStore AI</span>
+        </div>
+
+        <div className="w-full max-w-[420px]">
+          <div className="mb-10 text-center lg:text-left">
+            <h2 className="text-3xl font-bold text-white mb-3">Create an Account</h2>
+            <p className="text-slate-400">Set up your admin access to get started instantly.</p>
           </div>
           
           <form onSubmit={handleSignup} className="space-y-5">
             {error && (
-              <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm font-medium animate-pulse">
+              <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm font-medium flex items-center gap-2 animate-[fadeIn_0.3s_ease-out]">
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                 {error}
               </div>
             )}
             
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-300 ml-1">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-5 py-3.5 bg-dark-800/80 border border-slate-700/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-white transition-all shadow-sm"
+                className="w-full px-5 py-4 bg-dark-800 border border-slate-700/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-white placeholder-slate-500 transition-all shadow-sm"
                 placeholder="admin@smartstore.com"
                 required
               />
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-300 ml-1">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-5 py-3.5 bg-dark-800/80 border border-slate-700/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-white transition-all shadow-sm"
-                placeholder="••••••••"
+                className="w-full px-5 py-4 bg-dark-800 border border-slate-700/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-white placeholder-slate-500 transition-all shadow-sm"
+                placeholder="Create a strong password"
                 required
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Confirm Password</label>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-300 ml-1">Confirm Password</label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-5 py-3.5 bg-dark-800/80 border border-slate-700/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-white transition-all shadow-sm"
-                placeholder="••••••••"
+                className="w-full px-5 py-4 bg-dark-800 border border-slate-700/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-white placeholder-slate-500 transition-all shadow-sm"
+                placeholder="Repeat password"
                 required
               />
             </div>
@@ -148,18 +175,25 @@ const Signup = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-8 py-3.5 px-4 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0"
+              className="w-full mt-4 py-4 px-4 bg-white text-dark-900 hover:bg-slate-100 rounded-2xl font-bold text-lg transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0 flex items-center justify-center gap-2"
             >
-              {loading ? 'Creating Account...' : 'Sign Up'}
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-dark-900/30 border-t-dark-900 rounded-full animate-spin" />
+                  Creating Account...
+                </>
+              ) : 'Create Account'}
             </button>
           </form>
           
-          <p className="mt-8 text-center text-slate-400 text-sm">
-            Already have an account?{' '}
-            <Link to="/login" className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
-              Sign in here
-            </Link>
-          </p>
+          <div className="mt-10 text-center">
+            <p className="text-slate-400 text-sm">
+              Already have an account?{' '}
+              <Link to="/login" className="text-white hover:text-brand-400 font-semibold transition-colors border-b border-transparent hover:border-brand-400 pb-0.5">
+                Sign in here
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
