@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import AIChatWidget from './AIChatWidget';
 
 const Layout = () => {
   return (
@@ -10,6 +11,7 @@ const Layout = () => {
           <Outlet />
         </div>
       </main>
+      <AIChatWidget />
     </div>
   );
 };

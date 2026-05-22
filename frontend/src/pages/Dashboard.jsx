@@ -13,6 +13,7 @@ import {
 import { Line, Bar } from 'react-chartjs-2';
 import { FiDollarSign, FiShoppingBag, FiUsers, FiTrendingUp } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 ChartJS.register(
@@ -28,6 +29,7 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -78,10 +80,10 @@ const Dashboard = () => {
   };
 
   const stats = [
-    { title: 'Total Revenue', value: `$${dashboardData?.stats?.totalRevenue?.toLocaleString() || 0}`, icon: <FiDollarSign className="w-6 h-6 text-green-400" />, change: '+12.5%' },
-    { title: 'Total Orders', value: dashboardData?.stats?.totalUnitsSold?.toLocaleString() || '0', icon: <FiShoppingBag className="w-6 h-6 text-brand-400" />, change: '+8.2%' },
-    { title: 'Total Products', value: dashboardData?.stats?.totalProducts?.toLocaleString() || '0', icon: <FiUsers className="w-6 h-6 text-blue-400" />, change: '+5.1%' },
-    { title: 'Low Stock Items', value: dashboardData?.stats?.lowStockCount?.toString() || '0', icon: <FiTrendingUp className="w-6 h-6 text-orange-400" />, change: 'Alerts' },
+    { title: 'Total Revenue', value: `$${dashboardData?.stats?.totalRevenue?.toLocaleString() || 0}`, icon: <FiDollarSign className="w-6 h-6 text-green-400" />, change: '+12.5%', path: '/revenue' },
+    { title: 'Total Orders', value: dashboardData?.stats?.totalUnitsSold?.toLocaleString() || '0', icon: <FiShoppingBag className="w-6 h-6 text-brand-400" />, change: '+8.2%', path: '/orders' },
+    { title: 'Total Products', value: dashboardData?.stats?.totalProducts?.toLocaleString() || '0', icon: <FiUsers className="w-6 h-6 text-blue-400" />, change: '+5.1%', path: '/products' },
+    { title: 'Low Stock Items', value: dashboardData?.stats?.lowStockCount?.toString() || '0', icon: <FiTrendingUp className="w-6 h-6 text-orange-400" />, change: 'Alerts', path: '/products' },
   ];
 
   if (loading) return <div className="text-center p-8">Loading dashboard...</div>;
@@ -98,7 +100,11 @@ const Dashboard = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="glass p-6 rounded-2xl">
+          <div 
+            key={i} 
+            onClick={() => navigate(stat.path)}
+            className="glass p-6 rounded-2xl cursor-pointer hover:scale-[1.02] hover:bg-dark-800/80 hover:shadow-xl transition-all duration-300"
+          >
             <div className="flex justify-between items-start mb-4">
               <div className="p-3 bg-dark-800 rounded-lg border border-slate-700">
                 {stat.icon}
