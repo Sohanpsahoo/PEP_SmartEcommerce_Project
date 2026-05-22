@@ -160,6 +160,13 @@ const Dashboard = () => {
                 Your newest products are gaining traction. Consider running a promotional campaign.
               </p>
             </div>
+
+            <button 
+              onClick={() => navigate('/insights')}
+              className="w-full mt-4 py-2 bg-brand-500/10 hover:bg-brand-500/20 border border-brand-500/30 rounded-xl text-brand-300 text-sm font-medium transition-colors flex justify-center items-center gap-2"
+            >
+              View Full AI Report
+            </button>
           </div>
         </div>
       </div>

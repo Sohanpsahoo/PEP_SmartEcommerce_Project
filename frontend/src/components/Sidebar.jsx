@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FiGrid, FiBox, FiTrendingUp, FiLogOut, FiUser, FiShoppingBag, FiDollarSign } from 'react-icons/fi';
+import { FiGrid, FiBox, FiTrendingUp, FiLogOut, FiUser, FiShoppingBag, FiDollarSign, FiCpu } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
@@ -18,6 +18,7 @@ const Sidebar = () => {
     { name: 'Orders', path: '/orders', icon: <FiShoppingBag className="w-5 h-5" /> },
     { name: 'Revenue', path: '/revenue', icon: <FiDollarSign className="w-5 h-5" /> },
     { name: 'Products', path: '/products', icon: <FiBox className="w-5 h-5" /> },
+    { name: 'Insights', path: '/insights', icon: <FiCpu className="w-5 h-5" /> },
     { name: 'Profile', path: '/profile', icon: <FiUser className="w-5 h-5" /> },
   ];
 
