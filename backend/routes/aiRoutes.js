@@ -11,6 +11,36 @@ router.use(authMiddleware);
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+const modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash'];
+
+// Helper function to try multiple models sequentially
+async function generateWithFallback(promptOrAction, isChat = false, chatParams = null) {
+  let lastError;
+  for (const modelName of modelsToTry) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      if (isChat) {
+         const chat = model.startChat({
+            history: chatParams.history,
+            systemInstruction: chatParams.systemInstruction
+         });
+         const result = await chat.sendMessage(chatParams.message);
+         console.log(`Successfully generated chat response with ${modelName}`);
+         return result.response.text().trim();
+      } else {
+         const result = await model.generateContent(promptOrAction);
+         console.log(`Successfully generated content with ${modelName}`);
+         return result.response.text().trim();
+      }
+    } catch (err) {
+      console.warn(`[AI Fallback] Failed with model ${modelName}:`, err.message);
+      lastError = err;
+      // continue to next model in the array
+    }
+  }
+  throw lastError;
+}
+
 // POST /api/ai/generate-content — Generate description, SEO tags, marketing caption
 router.post('/generate-content', async (req, res) => {
   const { productName, category, price } = req.body;
@@ -18,8 +48,6 @@ router.post('/generate-content', async (req, res) => {
     if (!productName) {
       return res.status(400).json({ message: 'Product name is required.' });
     }
-
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     const prompt = `You are an expert e-commerce copywriter and SEO specialist. 
 For the product below, generate:
@@ -34,8 +62,7 @@ Price: $${price || 'N/A'}
 Respond ONLY in this exact JSON format, no markdown, no code blocks:
 {"description": "...", "seoTags": ["tag1", "tag2", "tag3", "tag4", "tag5"], "marketingCaption": "..."}`;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text().trim();
+    const responseText = await generateWithFallback(prompt);
 
     // Parse the JSON from Gemini's response
     let parsed;
@@ -91,8 +118,6 @@ router.post('/insights', async (req, res) => {
       )
       .join('\n');
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
     const prompt = `You are a senior e-commerce business analyst AI. Analyze the following product inventory and sales data and provide actionable insights.
 
 Products:
@@ -118,8 +143,7 @@ Rules:
 - Keep each recommendation concise (1-2 sentences).
 - Return at least 1 item per category.`;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text().trim();
+    const responseText = await generateWithFallback(prompt);
 
     let parsed;
     try {
@@ -287,8 +311,6 @@ router.post('/chat', async (req, res) => {
       - Low Stock Items (<=15): ${lowStockProducts || 'None'}
     `;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
     // Format history for Gemini
     const formattedHistory = (history || []).map(msg => {
        return {
@@ -297,16 +319,16 @@ router.post('/chat', async (req, res) => {
        };
     });
 
-    const chat = model.startChat({
-      history: formattedHistory,
-      systemInstruction: `You are SmartStore AI, an intelligent assistant for an e-commerce store owner.
+    const systemInstruction = `You are SmartStore AI, an intelligent assistant for an e-commerce store owner.
       Use the following store context to answer the user's questions accurately.
       ${storeContext}
-      Keep your answers concise, professional, and helpful. Do not use markdown formatting like asterisks for bolding, just plain text.`,
-    });
+      Keep your answers concise, professional, and helpful. Do not use markdown formatting like asterisks for bolding, just plain text.`;
 
-    const result = await chat.sendMessage(message);
-    const responseText = result.response.text().trim();
+    const responseText = await generateWithFallback(null, true, {
+      message,
+      history: formattedHistory,
+      systemInstruction
+    });
 
     res.json({ response: responseText });
   } catch (err) {
