@@ -7,7 +7,7 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { register } = useAuth();
+  const { signup } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -22,10 +22,10 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      await register(email, password);
+      await signup('Store Admin', email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err);
+      setError(typeof err === 'string' ? err : err?.message || 'Failed to create account.');
       setLoading(false);
     }
   };

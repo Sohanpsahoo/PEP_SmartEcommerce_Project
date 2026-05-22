@@ -1,6 +1,9 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Product = require('../models/Product');
+const Order = require('../models/Order');
+const Revenue = require('../models/Revenue');
 
 const router = express.Router();
 
@@ -18,6 +21,24 @@ router.post('/signup', async (req, res) => {
     // Create new user
     const user = new User({ name, email, password });
     await user.save();
+
+    // SEED DUMMY DATA FOR NEW ACCOUNT
+    try {
+      const p1 = await Product.create({ name: 'Smart Watch Pro', category: 'Wearables', price: 199, stock: 45, createdBy: user._id, salesData: { unitsSold: 120, revenue: 23880 } });
+      const p2 = await Product.create({ name: 'Wireless Earbuds', category: 'Electronics', price: 89, stock: 12, createdBy: user._id, salesData: { unitsSold: 300, revenue: 26700 } });
+      const p3 = await Product.create({ name: 'Ergonomic Desk Chair', category: 'Furniture', price: 249, stock: 8, createdBy: user._id, salesData: { unitsSold: 45, revenue: 11205 } });
+
+      const currentYear = new Date().getFullYear();
+      await Revenue.create({ month: 'Jan', year: currentYear, amount: 4500, note: 'New Year Sales', createdBy: user._id });
+      await Revenue.create({ month: 'Feb', year: currentYear, amount: 5200, note: 'Valentine Promo', createdBy: user._id });
+      await Revenue.create({ month: 'Mar', year: currentYear, amount: 6100, note: 'Spring Collection', createdBy: user._id });
+
+      await Order.create({ orderId: 'ORD-' + Math.floor(Math.random() * 1000000), customer: { name: 'Alice Smith', email: 'alice@example.com' }, totalAmount: 199, status: 'Delivered', items: [{ product: p1._id, quantity: 1, price: 199 }]});
+      await Order.create({ orderId: 'ORD-' + Math.floor(Math.random() * 1000000), customer: { name: 'Bob Johnson', email: 'bob@example.com' }, totalAmount: 178, status: 'Processing', items: [{ product: p2._id, quantity: 2, price: 89 }]});
+      await Order.create({ orderId: 'ORD-' + Math.floor(Math.random() * 1000000), customer: { name: 'Charlie Davis', email: 'charlie@example.com' }, totalAmount: 249, status: 'Shipped', items: [{ product: p3._id, quantity: 1, price: 249 }]});
+    } catch(seedErr) {
+      console.error('Error seeding dummy data:', seedErr);
+    }
 
     // Generate JWT
     const token = jwt.sign(
