@@ -1,16 +1,24 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { signup } = useAuth();
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    // Dummy signup
-    navigate('/dashboard');
+    setError('');
+    try {
+      await signup(name, email, password);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err);
+    }
   };
 
   return (
@@ -24,6 +32,7 @@ const Signup = () => {
         </div>
         
         <form onSubmit={handleSignup} className="space-y-5">
+          {error && <div className="p-3 bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg text-sm text-center">{error}</div>}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Full Name</label>
             <input

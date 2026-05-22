@@ -11,6 +11,8 @@ import {
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import { FiDollarSign, FiShoppingBag, FiUsers, FiTrendingUp } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 ChartJS.register(
   CategoryScale,
@@ -24,13 +26,29 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-  // Dummy Data for Revenue Chart
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const res = await axios.get('/api/analytics/dashboard');
+        setDashboardData(res.data);
+      } catch (err) {
+        console.error('Failed to load dashboard data', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
+
   const revenueData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+    labels: dashboardData?.revenueChart?.labels || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
     datasets: [
       {
         label: 'Revenue ($)',
-        data: [12000, 19000, 15000, 25000, 22000, 30000, 35000],
+        data: dashboardData?.revenueChart?.data || [0, 0, 0, 0, 0, 0, 0],
         borderColor: '#8b5cf6',
         backgroundColor: 'rgba(139, 92, 246, 0.2)',
         tension: 0.4,
@@ -58,11 +76,13 @@ const Dashboard = () => {
   };
 
   const stats = [
-    { title: 'Total Revenue', value: '$124,500', icon: <FiDollarSign className="w-6 h-6 text-green-400" />, change: '+12.5%' },
-    { title: 'Total Orders', value: '1,423', icon: <FiShoppingBag className="w-6 h-6 text-brand-400" />, change: '+8.2%' },
-    { title: 'Active Customers', value: '842', icon: <FiUsers className="w-6 h-6 text-blue-400" />, change: '+5.1%' },
-    { title: 'Conversion Rate', value: '3.6%', icon: <FiTrendingUp className="w-6 h-6 text-orange-400" />, change: '+1.2%' },
+    { title: 'Total Revenue', value: `$${dashboardData?.stats?.totalRevenue?.toLocaleString() || 0}`, icon: <FiDollarSign className="w-6 h-6 text-green-400" />, change: '+12.5%' },
+    { title: 'Total Orders', value: dashboardData?.stats?.totalUnitsSold?.toLocaleString() || '0', icon: <FiShoppingBag className="w-6 h-6 text-brand-400" />, change: '+8.2%' },
+    { title: 'Total Products', value: dashboardData?.stats?.totalProducts?.toLocaleString() || '0', icon: <FiUsers className="w-6 h-6 text-blue-400" />, change: '+5.1%' },
+    { title: 'Low Stock Items', value: dashboardData?.stats?.lowStockCount?.toString() || '0', icon: <FiTrendingUp className="w-6 h-6 text-orange-400" />, change: 'Alerts' },
   ];
+
+  if (loading) return <div className="text-center p-8">Loading dashboard...</div>;
 
   return (
     <div className="space-y-6">
@@ -113,21 +133,23 @@ const Dashboard = () => {
             <div className="bg-dark-800/80 p-4 rounded-xl border border-brand-500/20">
               <h4 className="text-sm font-medium text-brand-300 mb-2">Pricing Recommendation</h4>
               <p className="text-sm text-slate-300">
-                Consider lowering the price of "Wireless Earbuds X" by 5% to match current market trends and boost conversion by an estimated 15%.
+                Consider lowering the price of your top product by 5% to match current market trends and boost conversion by an estimated 15%.
               </p>
             </div>
             
             <div className="bg-dark-800/80 p-4 rounded-xl border border-orange-500/20">
               <h4 className="text-sm font-medium text-orange-300 mb-2">Inventory Alert</h4>
               <p className="text-sm text-slate-300">
-                "Smart Watch Pro" is running low (12 units left). Reorder soon to prevent stockouts during the weekend surge.
+                {dashboardData?.lowStockProducts?.length > 0 
+                  ? `"${dashboardData.lowStockProducts[0].name}" is running low (${dashboardData.lowStockProducts[0].stock} units left). Reorder soon.`
+                  : "All inventory levels are looking healthy."}
               </p>
             </div>
 
             <div className="bg-dark-800/80 p-4 rounded-xl border border-blue-500/20">
               <h4 className="text-sm font-medium text-blue-300 mb-2">Trending Insight</h4>
               <p className="text-sm text-slate-300">
-                "Ergonomic Keyboards" search volume is up 25% this week. Consider running a promotional campaign.
+                Your newest products are gaining traction. Consider running a promotional campaign.
               </p>
             </div>
           </div>

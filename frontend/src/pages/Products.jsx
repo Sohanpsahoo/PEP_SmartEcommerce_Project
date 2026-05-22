@@ -1,14 +1,74 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiCpu } from 'react-icons/fi';
+import axios from 'axios';
 
 const Products = () => {
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Wireless Earbuds X', price: 99.99, stock: 45, category: 'Electronics' },
-    { id: 2, name: 'Smart Watch Pro', price: 249.99, stock: 12, category: 'Wearables' },
-    { id: 3, name: 'Ergonomic Keyboard', price: 129.50, stock: 0, category: 'Accessories' },
-  ]);
-
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '', category: '', description: '', seoTags: '', marketingCaption: '' });
+  const [generatingAI, setGeneratingAI] = useState(false);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get('/api/products');
+      setProducts(res.data);
+    } catch (err) {
+      console.error('Failed to fetch products', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+    try {
+      await axios.delete(`/api/products/${id}`);
+      setProducts(products.filter(p => p._id !== id));
+    } catch (err) {
+      console.error('Failed to delete product', err);
+    }
+  };
+
+  const handleSaveProduct = async () => {
+    try {
+      const res = await axios.post('/api/products', newProduct);
+      setProducts([res.data.product, ...products]);
+      setShowModal(false);
+      setNewProduct({ name: '', price: '', stock: '', category: '', description: '', seoTags: '', marketingCaption: '' });
+    } catch (err) {
+      console.error('Failed to save product', err);
+      alert('Failed to save product: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const generateAIContent = async () => {
+    if (!newProduct.name || !newProduct.category) {
+      return alert('Please enter at least a Name and Category to generate AI content.');
+    }
+    setGeneratingAI(true);
+    try {
+      const res = await axios.post('/api/ai/generate-content', {
+        productName: newProduct.name,
+        category: newProduct.category,
+      });
+      setNewProduct(prev => ({
+        ...prev,
+        description: res.data.description,
+        seoTags: res.data.seoTags.join(', '),
+        marketingCaption: res.data.marketingCaption
+      }));
+    } catch (err) {
+      console.error('AI Generation failed', err);
+      alert('AI Generation failed.');
+    } finally {
+      setGeneratingAI(false);
+    }
+  };
 
   return (
     <div>
@@ -58,8 +118,8 @@ const Products = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700/50">
-            {products.map((product) => (
-              <tr key={product.id} className="hover:bg-dark-800/30 transition-colors">
+            {loading ? <tr><td colSpan="5" className="px-6 py-4 text-center">Loading...</td></tr> : products.map((product) => (
+              <tr key={product._id} className="hover:bg-dark-800/30 transition-colors">
                 <td className="px-6 py-4 font-medium">{product.name}</td>
                 <td className="px-6 py-4 text-slate-400">{product.category}</td>
                 <td className="px-6 py-4">${product.price.toFixed(2)}</td>
@@ -80,7 +140,7 @@ const Products = () => {
                     <button className="text-blue-400 hover:text-blue-300 transition-colors" title="Edit">
                       <FiEdit2 />
                     </button>
-                    <button className="text-red-400 hover:text-red-300 transition-colors" title="Delete">
+                    <button onClick={() => handleDelete(product._id)} className="text-red-400 hover:text-red-300 transition-colors" title="Delete">
                       <FiTrash2 />
                     </button>
                   </div>
@@ -100,21 +160,46 @@ const Products = () => {
               <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white">&times;</button>
             </div>
             
-            <div className="grid grid-cols-2 gap-6">
-              <div className="col-span-2">
+            <div className="grid grid-cols-2 gap-6 h-96 overflow-y-auto pr-2">
+              <div className="col-span-2 sm:col-span-1">
                 <label className="block text-sm font-medium text-slate-300 mb-2">Product Name</label>
-                <input type="text" className="w-full px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg focus:outline-none focus:border-brand-500" />
+                <input type="text" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg focus:outline-none focus:border-brand-500 text-white" />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="block text-sm font-medium text-slate-300 mb-2">Category</label>
+                <input type="text" value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg focus:outline-none focus:border-brand-500 text-white" />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="block text-sm font-medium text-slate-300 mb-2">Price ($)</label>
+                <input type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg focus:outline-none focus:border-brand-500 text-white" />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="block text-sm font-medium text-slate-300 mb-2">Stock</label>
+                <input type="number" value={newProduct.stock} onChange={e => setNewProduct({...newProduct, stock: e.target.value})} className="w-full px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg focus:outline-none focus:border-brand-500 text-white" />
               </div>
               
               <div className="col-span-2">
-                 <button className="w-full flex items-center justify-center gap-2 py-3 border border-brand-500 border-dashed rounded-lg text-brand-400 hover:bg-brand-500/10 transition-colors">
-                    <FiCpu /> Generate Description & SEO Tags with AI
+                 <button onClick={generateAIContent} disabled={generatingAI} className="w-full flex items-center justify-center gap-2 py-3 border border-brand-500 border-dashed rounded-lg text-brand-400 hover:bg-brand-500/10 transition-colors disabled:opacity-50">
+                    <FiCpu /> {generatingAI ? 'Generating...' : 'Generate Description & SEO Tags with AI'}
                  </button>
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">AI Description</label>
+                <textarea rows="3" value={newProduct.description || ''} onChange={e => setNewProduct({...newProduct, description: e.target.value})} className="w-full px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg focus:outline-none focus:border-brand-500 text-white"></textarea>
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="block text-sm font-medium text-slate-300 mb-2">SEO Tags</label>
+                <input type="text" value={newProduct.seoTags || ''} onChange={e => setNewProduct({...newProduct, seoTags: e.target.value})} className="w-full px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg focus:outline-none focus:border-brand-500 text-white" />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="block text-sm font-medium text-slate-300 mb-2">Marketing Caption</label>
+                <input type="text" value={newProduct.marketingCaption || ''} onChange={e => setNewProduct({...newProduct, marketingCaption: e.target.value})} className="w-full px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg focus:outline-none focus:border-brand-500 text-white" />
               </div>
 
               <div className="col-span-2 flex justify-end gap-3 mt-4">
                 <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-dark-800 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors">Cancel</button>
-                <button className="px-4 py-2 bg-brand-600 hover:bg-brand-500 rounded-lg text-white transition-colors shadow-lg shadow-brand-500/30">Save Product</button>
+                <button onClick={handleSaveProduct} className="px-4 py-2 bg-brand-600 hover:bg-brand-500 rounded-lg text-white transition-colors shadow-lg shadow-brand-500/30">Save Product</button>
               </div>
             </div>
           </div>

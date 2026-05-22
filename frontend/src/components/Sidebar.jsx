@@ -1,8 +1,17 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiGrid, FiBox, FiTrendingUp, FiLogOut } from 'react-icons/fi';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    logout();
+    navigate('/login');
+  };
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <FiGrid className="w-5 h-5" /> },
@@ -39,13 +48,13 @@ const Sidebar = () => {
       </nav>
 
       <div className="p-4 border-t border-slate-700/50">
-        <Link
-          to="/login"
-          className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all"
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all"
         >
           <FiLogOut className="w-5 h-5" />
           <span className="font-medium">Sign Out</span>
-        </Link>
+        </button>
       </div>
     </aside>
   );
