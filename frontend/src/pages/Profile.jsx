@@ -104,10 +104,12 @@ const Profile = () => {
           {/* Avatar */}
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-brand-400 via-purple-400 to-pink-400 rounded-full opacity-75 blur-sm group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
-            <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white font-bold text-5xl shadow-2xl ring-4 ring-white/10">
-              {profileData?.name?.charAt(0).toUpperCase() || 'A'}
-            </div>
-            <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-400 border-2 border-dark-900 rounded-full shadow-lg shadow-green-400/50"></div>
+            <img 
+              src="/profile.png" 
+              alt="Profile" 
+              className="relative w-28 h-28 rounded-full object-cover shadow-2xl ring-4 ring-white/10"
+            />
+            <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-400 border-2 border-dark-900 rounded-full shadow-lg shadow-green-400/50 z-10"></div>
           </div>
 
           {/* Info */}
