@@ -48,4 +48,34 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+// POST /api/orders — Create a manual order
+router.post('/', async (req, res) => {
+  try {
+    const { customerName, customerEmail, totalAmount, status } = req.body;
+
+    if (!customerName || totalAmount === undefined) {
+      return res.status(400).json({ message: 'Customer name and total amount are required.' });
+    }
+
+    // Generate a random order ID like ORD-4829
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const orderId = `ORD-${randomNum}`;
+
+    const newOrder = await Order.create({
+      orderId,
+      customer: {
+        name: customerName,
+        email: customerEmail || ''
+      },
+      items: [], // Manual orders don't strictly require items
+      totalAmount: parseFloat(totalAmount),
+      status: status || 'Processing'
+    });
+
+    res.status(201).json({ message: 'Order created successfully.', order: newOrder });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error.', error: err.message });
+  }
+});
+
 module.exports = router;

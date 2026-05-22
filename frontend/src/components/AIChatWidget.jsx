@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { FiMessageSquare, FiX, FiSend, FiCpu } from 'react-icons/fi';
+import axios from 'axios';
 
 const AIChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,32 +21,38 @@ const AIChatWidget = () => {
     }
   }, [messages, isOpen]);
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
     // Add user message
     const userMsg = { id: Date.now(), text: input, sender: 'user' };
-    setMessages(prev => [...prev, userMsg]);
+    const currentMessages = [...messages, userMsg];
+    setMessages(currentMessages);
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      let aiResponse = "I'm a demo AI assistant. In a full implementation, I would analyze your store's data and provide personalized insights!";
+    try {
+      // Prepare history to send to backend (skip the first initial greeting message if it's from the model)
+      const historyToProcess = messages.length > 0 && messages[0].sender === 'ai' ? messages.slice(1) : messages;
       
-      const lowerInput = userMsg.text.toLowerCase();
-      if (lowerInput.includes('revenue')) {
-        aiResponse = "Your revenue is up 12.5% this month! You can view the full breakdown on the Revenue page.";
-      } else if (lowerInput.includes('order')) {
-        aiResponse = "You have 1,747 total orders. The Orders page has all the recent details.";
-      } else if (lowerInput.includes('stock') || lowerInput.includes('inventory')) {
-        aiResponse = "You currently have 4 items running low on stock. I recommend checking the Products page to restock soon.";
-      }
+      const history = historyToProcess.map(msg => ({
+        sender: msg.sender,
+        text: msg.text
+      }));
 
-      setMessages(prev => [...prev, { id: Date.now(), text: aiResponse, sender: 'ai' }]);
+      const res = await axios.post('/api/ai/chat', {
+        message: userMsg.text,
+        history: history
+      });
+
+      setMessages(prev => [...prev, { id: Date.now(), text: res.data.response, sender: 'ai' }]);
+    } catch (err) {
+      console.error('Failed to get AI response', err);
+      setMessages(prev => [...prev, { id: Date.now(), text: "I'm having trouble connecting to the server right now. Please try again later.", sender: 'ai' }]);
+    } finally {
       setIsTyping(false);
-    }, 1200);
+    }
   };
 
   return (

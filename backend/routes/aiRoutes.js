@@ -1,6 +1,8 @@
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Product = require('../models/Product');
+const Revenue = require('../models/Revenue');
+const Order = require('../models/Order');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -232,5 +234,87 @@ function generateFallbackInsights(products) {
 
   return { pricing, trending, inventoryAlerts };
 }
+
+// POST /api/ai/chat — Conversational AI with store context
+router.post('/chat', async (req, res) => {
+  const { message, history } = req.body;
+  try {
+    if (!message) {
+      return res.status(400).json({ message: 'Message is required.' });
+    }
+
+    // Gather store context
+    const products = await Product.find().lean();
+    const orders = await Order.find().sort({ createdAt: -1 }).lean();
+    
+    // Revenue context
+    const currentYear = new Date().getFullYear();
+    const manualRevenue = await Revenue.aggregate([
+      { $match: { createdBy: req.userId, year: currentYear } },
+      { $group: { _id: '$month', total: { $sum: '$amount' } } },
+    ]);
+    
+    let totalManualRevenue = 0;
+    manualRevenue.forEach(item => totalManualRevenue += item.total);
+
+    const totalProducts = products.length;
+    const productRevenue = products.reduce((sum, p) => sum + (p.salesData?.revenue || 0), 0);
+    const totalUnitsSold = products.reduce((sum, p) => sum + (p.salesData?.unitsSold || 0), 0);
+    const totalRevenue = productRevenue + totalManualRevenue;
+    const lowStockProducts = products.filter((p) => p.stock <= 15).map(p => `${p.name} (${p.stock} left)`).join(', ');
+
+    // Top 3 products
+    const topProducts = [...products]
+      .sort((a, b) => (b.salesData?.revenue || 0) - (a.salesData?.revenue || 0))
+      .slice(0, 3)
+      .map((p) => `${p.name} ($${p.salesData?.revenue || 0} revenue)`)
+      .join(', ');
+
+    // Orders context
+    const totalOrderCount = orders.length;
+    const recentOrders = orders.slice(0, 5).map(o => `${o.orderId} - ${o.customer?.name} - $${o.totalAmount} - ${o.status}`).join(', ');
+    const processingCount = orders.filter(o => o.status === 'Processing').length;
+    const deliveredCount = orders.filter(o => o.status === 'Delivered').length;
+
+    const storeContext = `
+      Store Context:
+      - Total Products: ${totalProducts}
+      - Total Revenue: $${totalRevenue}
+      - Total Units Sold: ${totalUnitsSold}
+      - Total Orders: ${totalOrderCount} (Processing: ${processingCount}, Delivered: ${deliveredCount})
+      - 5 Most Recent Orders: ${recentOrders || 'None yet'}
+      - Top 3 Products: ${topProducts || 'None yet'}
+      - Low Stock Items (<=15): ${lowStockProducts || 'None'}
+    `;
+
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+    // Format history for Gemini
+    const formattedHistory = (history || []).map(msg => {
+       return {
+         role: msg.sender === 'user' ? 'user' : 'model',
+         parts: [{ text: msg.text }]
+       };
+    });
+
+    const chat = model.startChat({
+      history: formattedHistory,
+      systemInstruction: `You are SmartStore AI, an intelligent assistant for an e-commerce store owner.
+      Use the following store context to answer the user's questions accurately.
+      ${storeContext}
+      Keep your answers concise, professional, and helpful. Do not use markdown formatting like asterisks for bolding, just plain text.`,
+    });
+
+    const result = await chat.sendMessage(message);
+    const responseText = result.response.text().trim();
+
+    res.json({ response: responseText });
+  } catch (err) {
+    console.error('Gemini API error:', err.message);
+    
+    // Fallback response
+    res.json({ response: "I'm experiencing high traffic right now. Please try asking again in a few moments." });
+  }
+});
 
 module.exports = router;
