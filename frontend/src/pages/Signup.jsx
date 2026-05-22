@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiCpu, FiTrendingUp, FiEdit3, FiShield, FiCheckCircle } from 'react-icons/fi';
+import { FiCpu, FiTrendingUp, FiEdit3, FiShield, FiCheckCircle, FiUser } from 'react-icons/fi';
 
 const Signup = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,7 +23,7 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      await signup('Store Admin', email, password);
+      await signup(name, email, password);
       navigate('/dashboard');
     } catch (err) {
       setError(typeof err === 'string' ? err : err?.message || 'Failed to create account.');
@@ -136,6 +137,18 @@ const Signup = () => {
               </div>
             )}
             
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-300 ml-1">Full Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-5 py-4 bg-dark-800 border border-slate-700/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 text-white placeholder-slate-500 transition-all shadow-sm"
+                placeholder="John Doe"
+                required
+              />
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-slate-300 ml-1">Email Address</label>
               <input
