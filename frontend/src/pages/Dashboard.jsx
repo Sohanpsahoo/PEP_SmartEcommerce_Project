@@ -31,13 +31,18 @@ ChartJS.register(
 const Dashboard = () => {
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
+  const [aiInsights, setAiInsights] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const res = await axios.get('/api/analytics/dashboard');
-        setDashboardData(res.data);
+        const [dashRes, insightsRes] = await Promise.all([
+          axios.get('/api/analytics/dashboard'),
+          axios.post('/api/ai/insights') // fetch real insights
+        ]);
+        setDashboardData(dashRes.data);
+        setAiInsights(insightsRes.data.data);
       } catch (err) {
         console.error('Failed to load dashboard data', err);
       } finally {
@@ -81,12 +86,16 @@ const Dashboard = () => {
 
   const stats = [
     { title: 'Total Revenue', value: `$${dashboardData?.stats?.totalRevenue?.toLocaleString() || 0}`, icon: <FiDollarSign className="w-6 h-6 text-green-400" />, change: '+12.5%', path: '/revenue' },
-    { title: 'Total Orders', value: dashboardData?.stats?.totalUnitsSold?.toLocaleString() || '0', icon: <FiShoppingBag className="w-6 h-6 text-brand-400" />, change: '+8.2%', path: '/orders' },
+    { title: 'Total Orders', value: dashboardData?.stats?.totalOrders?.toLocaleString() || '0', icon: <FiShoppingBag className="w-6 h-6 text-brand-400" />, change: '+8.2%', path: '/orders' },
     { title: 'Total Products', value: dashboardData?.stats?.totalProducts?.toLocaleString() || '0', icon: <FiUsers className="w-6 h-6 text-blue-400" />, change: '+5.1%', path: '/products' },
     { title: 'Low Stock Items', value: dashboardData?.stats?.lowStockCount?.toString() || '0', icon: <FiTrendingUp className="w-6 h-6 text-orange-400" />, change: 'Alerts', path: '/products' },
   ];
 
   if (loading) return <div className="text-center p-8">Loading dashboard...</div>;
+
+  const pricingRec = aiInsights?.pricing?.[0];
+  const trendingRec = aiInsights?.trending?.[0];
+  const inventoryAlert = aiInsights?.inventoryAlerts?.[0];
 
   return (
     <div className="space-y-6">
@@ -141,23 +150,27 @@ const Dashboard = () => {
             <div className="bg-dark-800/80 p-4 rounded-xl border border-brand-500/20">
               <h4 className="text-sm font-medium text-brand-300 mb-2">Pricing Recommendation</h4>
               <p className="text-sm text-slate-300">
-                Consider lowering the price of your top product by 5% to match current market trends and boost conversion by an estimated 15%.
+                {pricingRec 
+                  ? `${pricingRec.recommendation} (${pricingRec.product})` 
+                  : 'Add more sales data for pricing recommendations.'}
               </p>
             </div>
             
             <div className="bg-dark-800/80 p-4 rounded-xl border border-orange-500/20">
               <h4 className="text-sm font-medium text-orange-300 mb-2">Inventory Alert</h4>
               <p className="text-sm text-slate-300">
-                {dashboardData?.lowStockProducts?.length > 0 
-                  ? `"${dashboardData.lowStockProducts[0].name}" is running low (${dashboardData.lowStockProducts[0].stock} units left). Reorder soon.`
-                  : "All inventory levels are looking healthy."}
+                {inventoryAlert 
+                  ? inventoryAlert.alert 
+                  : 'All inventory levels are looking healthy.'}
               </p>
             </div>
 
             <div className="bg-dark-800/80 p-4 rounded-xl border border-blue-500/20">
               <h4 className="text-sm font-medium text-blue-300 mb-2">Trending Insight</h4>
               <p className="text-sm text-slate-300">
-                Your newest products are gaining traction. Consider running a promotional campaign.
+                {trendingRec 
+                  ? trendingRec.insight 
+                  : 'Add more products to see trending insights.'}
               </p>
             </div>
 

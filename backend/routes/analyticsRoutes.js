@@ -1,6 +1,7 @@
 const express = require('express');
 const Product = require('../models/Product');
 const Revenue = require('../models/Revenue');
+const Order = require('../models/Order');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -11,10 +12,13 @@ router.get('/dashboard', async (req, res) => {
   try {
     const products = await Product.find().lean();
 
-    // Calculate totals from products
+    // Calculate totals from products & orders
     const totalProducts = products.length;
     const productRevenue = products.reduce((sum, p) => sum + (p.salesData?.revenue || 0), 0);
-    const totalUnitsSold = products.reduce((sum, p) => sum + (p.salesData?.unitsSold || 0), 0);
+    
+    // Count actual orders
+    const totalOrders = await Order.countDocuments();
+    
     const lowStockProducts = products.filter((p) => p.stock <= 15);
 
     // Top 5 products by revenue
@@ -58,7 +62,7 @@ router.get('/dashboard', async (req, res) => {
       stats: {
         totalRevenue,
         totalProducts,
-        totalUnitsSold,
+        totalOrders,
         lowStockCount: lowStockProducts.length,
       },
       topProducts,
